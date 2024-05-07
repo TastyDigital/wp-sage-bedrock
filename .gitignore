@@ -88,7 +88,7 @@ wp-cli.local.yml
 /www
 /public_html/.well-known
 /public_html/cgi-bin
-/staging.circadian.io
+/staging.starter.tsty.co
 
 #caching
 public_html/app/litespeed/
