@@ -1,0 +1,3 @@
+path: public_html/wp
+server:
+  docroot: public_html

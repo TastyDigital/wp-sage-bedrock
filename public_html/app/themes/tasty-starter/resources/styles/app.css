@@ -1,0 +1,56 @@
+@import "common/base.css";
+@import "common/forms.css";
+@tailwind components;
+@tailwind utilities;
+
+#app {
+    @apply flex flex-col;
+
+    min-height: 100dvh;
+}
+
+body.admin-bar #app {
+    min-height: calc(100dvh - var(--wp-admin--admin-bar--height));
+}
+
+@layer components {
+    .container {
+        max-width: 1536px;
+
+        /* @apply max-w-screen-xl; */
+
+    }
+
+    .footer-widgets .widget_block {
+        @apply mb-6;
+    }
+
+    main.main .page-header {
+        @apply mb-8;
+    }
+
+    main.main > .container {
+        @apply mb-12;
+    }
+
+    .nav-primary .nav {
+        @apply flex items-center justify-around;
+    }
+
+    .nav-primary .nav a {
+        @apply text-blue-600 decoration-0 no-underline p-4 block text-base hover:text-blue-900;
+    }
+
+    #mobile-menu {
+        @apply hidden;
+    }
+
+}
+
+.wp-block-search__button {
+    @apply ml-0;
+}
+
+.widget_block {
+    @apply mb-2;
+}

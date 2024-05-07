@@ -1,0 +1,147 @@
+.clear-form {
+    clear: both;
+}
+
+input::placeholder {
+    transition: opacity 0.3s ease-out;
+}
+
+input:hover::placeholder {
+    opacity: 0.5;
+}
+
+input:focus::placeholder {
+    opacity: 0.3;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='tel'],
+input[type='url'],
+input[type='search'],
+textarea,
+textarea#comment {
+    box-sizing: border-box;
+    width: 100%;
+    padding: .5rem;
+    font: inherit;
+    @apply border border-slate-400 shadow-slate-500/20 block w-full shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50;
+}
+
+select {
+    box-sizing: border-box;
+    width: 100%;
+    font: inherit;
+    background: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' xml:space='preserve' viewBox='0 0 16 16'%3e%3cg fill='%23AAA'%3e%3cpath d='m4.464 6.05-.707.707L8 11l4.243-4.243-.707-.707L8 9.586z'/%3e%3c/g%3e%3c/svg%3e") no-repeat right .5rem center/1.5rem 1.5rem;
+    appearance: none;
+    @apply border border-slate-400 shadow-slate-500/20 block w-full shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50;
+}
+
+/*
+	Using :where we will keep a lower CSS specificity,
+	allowing themes to easily override these styles
+*/
+:where(textarea) {
+    height: 200px;
+}
+
+
+input[type='radio'],
+input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    float: none;
+    margin: 0 0.75rem 0 0;
+}
+
+input[type='checkbox'] {
+    top: 0;
+    margin-left: 0;
+}
+
+label {
+    margin-bottom: 0.25em;
+    float: none;
+    font-weight: bold;
+    display: block;
+}
+
+label.consent {
+    font-size: 13px;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+}
+
+label.consent-implicit input {
+    display: none;
+}
+
+label.checkbox,
+label.checkbox-multiple,
+label.radio {
+    margin-bottom: 0;
+    float: none;
+    font-weight: normal;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.5;
+}
+
+label span {
+    font-size: 85%;
+    margin-left: 0.25em;
+    font-weight: normal;
+    opacity: 0.45;
+}
+
+.form-errors .form-error-message {
+    color: red;
+}
+
+
+.comment-respond {
+    @apply mt-6;
+}
+
+.comment-form p:not(.comment-form-cookies-consent, .comment-notes, .logged-in-as, .form-submit) {
+    @apply grid gap-4 mb-2;
+
+    grid-template-columns: minmax(120px, 1fr) repeat(2, 3fr);
+}
+
+.comment-form p.comment-form-cookies-consent {
+    @apply my-4;
+}
+
+.comment-form p.comment-form-cookies-consent > * {
+    @apply inline-block align-middle;
+}
+
+.contact-grid  .submit-cell {
+    @apply lg:row-span-2 lg:h-full lg:max-h-24;
+}
+
+.contact-grid .submit-cell > p {
+    height:100%;
+    position:relative;
+}
+
+.submit-cell p .wpcf7-spinner {
+    position: absolute;
+    right:.125rem;
+    top:50%;
+    transform: translateY(-50%);
+}
+
+.comment-form p {
+    @apply mb-4;
+}
+
+.contact-grid {
+    @apply grid grid-rows-5 lg:grid-rows-2 grid-flow-col gap-4;
+}
+
+.contact-grid p {
+    margin:0;
+}

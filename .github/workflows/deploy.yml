@@ -1,0 +1,188 @@
+name: Continuous integration
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the main branches
+  push:
+    branches: [ main, development, staging ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    name: Build
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: imagick, gd
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: /tmp/composer-cache
+          key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      - name: Add HTTP basic auth credentials
+        run: echo '${{ secrets.SP_AUTH }}' > $GITHUB_WORKSPACE/auth.json
+
+      - name: Install PHP dependencies
+        uses: php-actions/composer@v6
+        with:
+          php_version: "8.2"
+          dev: no
+          args: --profile --ignore-platform-reqs
+
+      - name: Remove auth.json file
+        run: rm -f $GITHUB_WORKSPACE/auth.json
+
+      - name: Yarn install
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'yarn'
+          cache-dependency-path: public_html/app/themes/tasty-starter/yarn.lock
+      - run: cd public_html/app/themes/tasty-starter && composer install && yarn install && yarn build # --immutable --immutable-cache --check-cache # optional
+
+#      - uses: actions/upload-artifact@v2
+#        with:
+#          name: debug-output
+#          path: output.log
+
+      - name: Build rsyncignore file
+        run: |
+          touch rsyncignore.txt
+          cat .gitignore | sed -e 's/vendor.*$//' -e 's/public_html\/app\/plugins.*$//' -e 's/public_html\/app\/mu-plugins.*$//' -e 's/public_html\/app\/themes.*$//'  -e 's/public_html\/wp.*$//' -e 's/\/\*//' -e 's/#.*$//' -e 's/!.*$//' -e 's:/*$::' -e '/^$/d' > rsyncignore.txt
+          echo -e "\nrsyncignore.txt" >> rsyncignore.txt
+
+      - name: Zip artifacts for deployment
+        run: zip -r deployment.zip ./* -x ./node_modules/**\*
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-code
+          path: deployment.zip
+
+#      - name: Build .env file
+#        run: |
+#          touch .env
+#          echo -e "Testing file deploment" >> .env
+#        echo -e "AUTH_KEY='${{ secrets.AUTH_KEY' }}" >> .env
+#        echo -e "SECURE_AUTH_KEY='${{ secrets.SECURE_AUTH_KEY' }}" >> .env
+#        echo -e "LOGGED_IN_KEY='${{ secrets.LOGGED_IN_KEY' }}" >> .env
+#        echo -e "NONCE_KEY='${{ secrets.NONCE_KEY' }}" >> .env
+#        echo -e "AUTH_SALT='${{ secrets.AUTH_SALT' }}" >> .env
+#        echo -e "SECURE_AUTH_SALT='${{ secrets.SECURE_AUTH_SALT' }}" >> .env
+#        echo -e "LOGGED_IN_SALT='${{ secrets.LOGGED_IN_SALT' }}" >> .env
+#        echo -e "NONCE_SALT='${{ secrets.NONCE_SALT' }}" >> .env
+#        echo -e "DB_NAME='${{ secrets.DB_NAME }}'" >> .env
+#        echo -e "DB_USER='${{ secrets.DB_USER }}'" >> .env
+#        echo -e "DB_PREFIX='${{ secrets.DB_PREFIX }}'" >> .env
+#        echo -e "DB_PASSWORD='${{ secrets.DB_PASSWORD }}'" >> .env
+#        echo -e "WP_ENV='development'" >> .env
+#        echo -e "WP_HOME='https://pwyf.tsty.co'" >> .env
+#        echo -e "WP_SITEURL=\"\${WP_HOME}/wp\"" >> .env
+        # echo -e "DISABLE_WP_CRON=true" >> .env
+
+  deploy-staging:
+    if: ${{ github.ref_name == 'staging' }}
+    name: Deploy Staging
+    # The type of runner that the job will run on
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.starter.tsty.co
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-code
+
+      - name: Unzip artifacts for deployment
+        run: unzip -o deployment.zip -d ./
+
+      - name: Remove Zip
+        run: rm deployment.zip
+
+      - name: Deployment rsync
+        uses: burnett01/rsync-deployments@6.0.0
+        with: # need group write permissions and ssh user added to www-data group to do this
+          switches: -av --exclude="node_modules" --include=".env" --exclude=".*"
+          remote_path: ./staging.starter.tasty.digital/
+          remote_host: ${{ secrets.HOST }}
+          remote_port: ${{ secrets.DEPLOY_PORT }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.PRIVATE_KEY}}
+          remote_key_pass: ${{ secrets.PASS_PHRASE }}
+
+      - name: Deployment rsync clean
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -rv --delete --exclude="node_modules" --exclude-from=rsyncignore.txt --exclude=".*"
+          remote_path: ./staging.starter.tasty.digital/
+          remote_host: ${{ secrets.HOST }}
+          remote_port: ${{ secrets.DEPLOY_PORT }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.PRIVATE_KEY}}
+          remote_key_pass: ${{ secrets.PASS_PHRASE }}
+
+
+  deploy-production:
+    if: ${{ github.ref_name == 'main' }} # protected branch
+    name: Deploy Production
+    # The type of runner that the job will run on
+    needs: [build]
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://starter.tsty.co
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-code
+
+      - name: Unzip artifacts for deployment
+        run: unzip -o deployment.zip -d ./
+
+      - name: Remove Zip
+        run: rm deployment.zip
+
+      #      - name: Display structure of downloaded files
+      #        run: ls -R
+
+      - name: Deployment rsync
+        uses: burnett01/rsync-deployments@6.0.0
+        with: # need group write permissions and ssh user added to www-data group to do this
+          switches: -av --exclude="node_modules" --include=".env" --exclude=".*"
+          remote_path: ./
+          remote_host: ${{ secrets.HOST }}
+          remote_port: ${{ secrets.DEPLOY_PORT }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.PRIVATE_KEY}}
+          remote_key_pass: ${{ secrets.PASS_PHRASE }}
+
+      - name: Deployment rsync clean
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -rv --delete --exclude="node_modules" --exclude-from=rsyncignore.txt --exclude=".*"
+          remote_path: ./
+          remote_host: ${{ secrets.HOST }}
+          remote_port: ${{ secrets.DEPLOY_PORT }}
+          remote_user: ${{ secrets.USERNAME }}
+          remote_key: ${{ secrets.PRIVATE_KEY}}
+          remote_key_pass: ${{ secrets.PASS_PHRASE }}

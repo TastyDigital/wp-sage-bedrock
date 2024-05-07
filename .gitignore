@@ -1,0 +1,96 @@
+# Application
+public_html/app/plugins/*
+!public_html/app/plugins/.gitkeep
+!public_html/app/plugins/tasty-*
+!public_html/app/plugins/tasty-starter-post-types
+
+public_html/app/mu-plugins/*/
+public_html/app/themes/*
+!public_html/app/themes/tasty-starter
+public_html/app/themes/tasty-starter/node_modules
+public_html/app/upgrade
+public_html/app/uploads/*
+!public_html/app/uploads/.gitkeep
+public_html/app/cache/*
+public_html/app/languages/*
+
+# WordPress
+public_html/wp
+public_html/.htaccess
+public_html/.htaccess.bk
+public_html/app/.object-cache.ini
+public_html/app/advanced-cache.php
+public_html/app/cache/
+public_html/app/object-cache.php
+
+# Logs
+*.log
+
+# Dotenv
+.env
+.env.*
+!.env.example
+auth.json
+
+# Composer
+/vendor
+
+# Node
+/node_modules
+
+# WP-CLI
+wp-cli.local.yml
+
+
+# Mac
+.DS_Store
+
+
+# cPanel
+.bash_history
+.bash_logout
+.bash_profile
+.bashrc
+.cagefs
+.cl.selector
+.composer
+.contactemail
+.cpanel
+.cphorde
+.emacs
+.gemrc
+.htaccess
+.htpasswds
+.lastlogin
+.memcached
+.memcached.on
+.patchman
+.softaculous
+.spamassassin
+.spamassassinboxenable
+.spamassassinenable
+.ssh
+.subaccounts
+.subversion
+.trash
+.zshrc
+.viminfo
+/access-logs
+/etc
+/logs
+/lscache
+/mail
+/perl5
+/public_ftp
+/srbackups
+/ssl
+/tmp
+/www
+/public_html/.well-known
+/public_html/cgi-bin
+/staging.circadian.io
+
+#caching
+public_html/app/litespeed/
+public_html/app/updraft/
+public_html/app/.litespeed_conf.dat

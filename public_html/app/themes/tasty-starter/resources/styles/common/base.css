@@ -1,0 +1,87 @@
+
+@tailwind base;
+
+@layer base {
+    body {
+        @apply text-base;
+    }
+
+    h1 {
+        @apply text-6xl font-bold leading-tight;
+    }
+
+    h1.entry-title {
+        @apply text-6xl lg:text-7xl mb-8 font-bold;
+
+    }
+
+    h1.site-name {
+        @apply text-2xl font-normal py-6;
+
+        > a {
+            @apply block;
+        }
+    }
+
+    h2, h3, h4, h5, h6 {
+        @apply font-bold;
+    }
+
+    h2 {
+        @apply text-5xl leading-tight;
+    }
+
+    .sidebar h2,
+    .site-footer h2 {
+        @apply text-3xl;
+    }
+
+    h3 {
+        @apply text-xl;
+
+        margin-top:1em;
+    }
+
+    h4 {
+        @apply text-lg mb-0;
+
+        margin-top:1em;
+    }
+
+    h5 {
+        @apply text-base;
+    }
+
+    h6 {
+        @apply text-sm;
+
+        margin-top:1em;
+    }
+
+    p {
+        @apply mt-0;
+
+        margin-bottom:1em;
+    }
+
+    a {
+        @apply text-blue-600 hover:underline;
+    }
+
+    b, strong {
+        @apply font-bold;
+    }
+
+    blockquote {
+        margin-top:1em;
+        margin-bottom:1em;
+    }
+
+    select {
+        @apply p-2;
+    }
+
+    button, [type='button'], [type='reset'], [type='submit'] {
+        @apply text-white bg-blue-500 hover:bg-blue-700 py-2 px-4;
+    }
+}
